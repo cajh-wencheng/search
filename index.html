@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <title>段考成績查詢</title>
+    <style>
+        body {
+            font-family: "DFKai-SB", Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 3.0em;
+            color: #007BFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        select,
+        input[type="password"] {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #5a5a5a;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 1.3em;
+        }
+
+       #result p { /* 選取所有 #result 下的 <p> 標籤 */
+            font-family: "Microsoft JhengHei", Arial, sans-serif; /* 中圓體 */
+            font-weight: bold;
+            margin: 10px 0;
+            color: #008000; /* 綠色 */
+        }
+
+        #result p span.number { /* 選取數字部分 */
+            font-family: "Times New Roman", serif; /* 數字使用 Times New Roman */
+            color: #000; /* 黑色 */
+        }
+    </style>
+    <script>
+        function loadDropdownOptions() {
+            google.script.run.withSuccessHandler(updateDropdowns).getDropdownOptions();
+        }
+
+        function updateDropdowns(data) {
+            const seatNumberSelect = document.getElementById('seatNumber');
+            const countSelect = document.getElementById('count');
+
+            seatNumberSelect.innerHTML = '';
+            countSelect.innerHTML = '';
+
+            data.seatNumbers.forEach(seat => {
+                const option = document.createElement('option');
+                option.value = seat;
+                option.text = seat;
+                seatNumberSelect.add(option);
+            });
+
+            data.counts.forEach(count => {
+                const option = document.createElement('option');
+                option.value = count;
+                option.text = count;
+                countSelect.add(option);
+            });
+        }
+
+        function filterData() {
+            const seatNumber = document.getElementById('seatNumber').value;
+            const count = document.getElementById('count').value;
+            const password = document.getElementById('password').value;
+
+            google.script.run.withSuccessHandler(displayData).getFilteredData(seatNumber, count, password);
+        }
+
+        function displayData(data) {
+        const resultDiv = document.getElementById('result');
+        if (data) {
+            resultDiv.innerHTML = `
+          <p><span>座號:</span> <span class="number">${data.seatno}</span></p>
+          <p><span>姓名:</span> <span class="chinese">${data.name}</span></p>
+          <p><span>中文:</span> <span class="number">${data.chinese}</span></p>
+          <p><span>英文:</span> <span class="number">${data.english}</span></p>
+          <p><span>數學:</span> <span class="number">${data.math}</span></p>
+          <p><span>自然:</span> <span class="number">${data.nature}</span></p>
+          <p><span>社會:</span> <span class="number">${data.society}</span></p>
+          <p><span>總分:</span> <span class="number">${data.total}</span></p>
+          <p><span>平均:</span> <span class="number">${data.average}</span></p>
+          <p><span>排名:</span> <span class="number">${data.rank}</span></p>
+          <p><span>上次排名:</span> <span class="number">${data.last_rank}</span></p>
+          <p><span>進步分數:</span> <span class="number">${data.increase_score}</span></p>
+          <img src="${data.imageUrl}" alt="組距圖片" style="max-width: 100%;">
+        `;
+        } else {
+            resultDiv.innerHTML = '<p>查無符合條件的資料。</p>';
+        }
+      }
+    </script>
+</head>
+
+<body onload="loadDropdownOptions()">
+    <h1>段考成績查詢系統</h1>
+    <label for="seatNumber">座號及姓名:</label>
+    <select id="seatNumber"></select>
+    <br>
+    <label for="count">次數:</label>
+    <select id="count"></select>
+    <br>
+    <label for="password">密碼:</label>
+    <input type="password" id="password">
+    <br>
+    <button onclick="filterData()">查詢</button>
+    <div id="result"></div>
+    <iframe src="https://script.google.com/macros/s/AKfycbxkVK3VUxdWA1iwt3YSqKNCXapafGXig4cZPU5wmLqlVDL4H5WvYhwwvUhz4eJZrYYq/exec" width="100%" height="600px"></iframe>
+</body>
+
+</html>
